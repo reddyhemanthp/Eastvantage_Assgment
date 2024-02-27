@@ -1,0 +1,49 @@
+Question 1: Explain how FastAPI handles asynchronous requests and its benefits over synchronous code in Python.
+
+FastAPI is built on top of Python's asyncio framework, which allows it to handle asynchronous requests efficiently. Asynchronous programming is a programming paradigm that allows non-blocking execution of code. In the context of FastAPI:
+    - Async Function Support: FastAPI allows you to define asynchronous routes using async def syntax. This enables you to use asynchronous libraries and functions within your route handlers.
+        @main_router.post("/books/", response_model=Book)
+        async def create_book(book: BookCreate, db: Session = Depends(get_session)):
+        # Asynchronous code handling here
+    - Concurrency: FastAPI leverages asynchronous capabilities to handle multiple requests concurrently without blocking the execution of other tasks. This can significantly improve the performance of your application, especially when dealing with I/O-bound operations like interacting with databases or making API calls.
+    - Fast Event Loop: FastAPI utilizes the powerful event loop provided by Python's asyncio, allowing it to efficiently manage and switch between multiple tasks without the need for creating additional threads or processes.
+
+
+Question 2: Describe how dependency injection works in FastAPI and give an example of its practical use.
+
+FastAPI uses a dependency injection system to manage and inject dependencies into route handlers. Dependency injection simplifies code organization and testing by providing a way to declare dependencies once and use them across multiple routes.
+In the provided code, dependencies are defined using the Depends class from FastAPI. For example:  
+    async def create_book(book: BookCreate, db: Session = Depends(get_session)):
+    # db is a dependency injected using Depends
+    Here, get_session is a dependency function that defines how to create a Session dependency. This dependency is automatically injected into the create_book route handler.
+    Practical use example:
+
+    def get_current_user(token: str = Depends(get_token)):
+    # Dependency to get the current user based on the provided token
+    user = decode_token(token)
+    return user
+
+    @app.get("/users/me")
+    async def read_current_user(current_user: User = Depends(get_current_user)):
+        # The current_user dependency is injected into the route handler
+        return current_user
+    
+    In this example, read_current_user route handler depends on get_current_user, and FastAPI automatically injects the result of this dependency into the handler.
+
+Question 3: Code Walkthrough
+         The provided FastAPI code includes the following functionalities:
+
+ -Database Initialization: Tables are created during the startup event using Base.metadata.create_all(bind=get_db_engine()).
+
+ -Create Book Endpoint: Creates a new book in the database. Handles HTTP POST requests to /books/.
+
+ -Get Books Endpoint: Retrieves the list of books from the database. Handles HTTP GET requests to /books/.
+
+ -Create Review Endpoint: Creates a review for a specified book, triggers a background task to send a confirmation email. Handles HTTP POST requests to /reviews/{book_id}.
+
+ -Get Reviews Endpoint: Retrieves the reviews for a specified book. Handles HTTP GET requests to /reviews/{book_id}.
+
+ -Validation and error handling are implemented, and the code includes HTTPException to return appropriate responses.    
+
+
+
